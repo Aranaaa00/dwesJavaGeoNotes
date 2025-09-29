@@ -1,6 +1,8 @@
 package com.example.geonotesteaching;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /*
@@ -73,7 +75,10 @@ public class GeoNotes {
                     case 2 -> listNotes();
                     case 3 -> filterNotes();
                     case 4 -> exportNotesToJson();
-                    case 5 -> running = false;
+                    case 5 -> listarRecientes();
+                    case 6 -> busquedaAvanzada();
+                    case 7 -> mostrarLugaresNotes();
+                    case 8 -> running = false;
                     default -> System.out.println("❌ Opción no válida. Inténtalo de nuevo.");
                 }
             } catch (NumberFormatException e) {
@@ -87,13 +92,84 @@ public class GeoNotes {
         System.out.println("¡Gracias por usar GeoNotes! 👋");
     }
 
+    private static void mostrarLugaresNotes() {
+        for (Note nota : timeline.getNotes().values()) {
+            System.out.println(Match.where(nota.location()));
+        }
+    }
+
+    private static void busquedaAvanzada() {
+        System.out.println("¿Por qué quieres buscar?");
+        System.out.println("1. Por latitud o longitud");
+        System.out.println("2. Palabra clave");
+
+        int opcion = scanner.nextInt();
+        scanner.nextLine();
+
+        if (opcion == 1) {
+            busquedaLatLong();
+        } else if (opcion == 2) {
+            busquedaPalabraClave();
+        } else {
+            System.out.println("Opción no valida");
+        }
+
+    }
+
+    private static void busquedaLatLong() {
+        String respuesta = "";
+        int min, max;
+
+        do {
+            System.out.println("Indica si quieres buscar por Latitud o Longitud (lat - lon):");
+            respuesta = scanner.next();
+
+            System.out.println("Indica el mínimo del rango:");
+            min = scanner.nextInt();
+            System.out.println("Indica el máximo del rango:");
+            max = scanner.nextInt();
+
+            scanner.nextLine();
+        } while ((!respuesta.equals("lat") || !respuesta.equals("lon")) && min > max);
+
+        for (Long id : timeline.getNotes().keySet()) {
+
+            if ("lat".equals(respuesta)) {
+                double lat = timeline.getNote(id).location().lat();
+
+                if (lat <= max && lat >= min) {
+                    System.out.println(timeline.getNote(id));
+                }
+            } else if ("lon".equals(respuesta)) {
+                double lon = timeline.getNote(id).location().lon();
+
+                if (lon <= max && lon >= min) {
+                    System.out.println(timeline.getNote(id));
+                }
+            }
+        }
+    }
+
+    private static void busquedaPalabraClave() {
+        String palabraClave = scanner.nextLine();
+
+        for (Note note : timeline.getNotes().values()) {
+            if (note.title().contains(palabraClave) || note.content().contains(palabraClave)) {
+                System.out.println(note);
+            }
+        }
+    }
+
     private static void printMenu() {
         System.out.println("\n--- Menú ---");
         System.out.println("1. Crear una nueva nota");
         System.out.println("2. Listar todas las notas");
         System.out.println("3. Filtrar notas por palabra clave");
         System.out.println("4. Exportar notas a JSON (Text Blocks)");
-        System.out.println("5. Salir");
+        System.out.println("5. Listar últimas N notas");
+        System.out.println("6. Busqueda avanzada");
+        System.out.println("7. Lugar de las notes");
+        System.out.println("8. Salir");
         System.out.print("Elige una opción: ");
     }
 
@@ -129,7 +205,7 @@ public class GeoNotes {
              * Instant.now() (java.time) para timestamps — la API java.time es la recomendada desde Java 8.
              * attachment lo dejamos a null en este flujo simple; podrías pedirlo al usuario.
              */
-            var note = new Note(noteCounter++, title, content, geoPoint, Instant.now(), null);
+            var note = new Note(noteCounter++, title, content, geoPoint, Instant.now(), new Audio("song.mp3", 320));
             timeline.addNote(note);
             System.out.println("✅ Nota creada con éxito.");
         } catch (IllegalArgumentException e) {
@@ -228,5 +304,19 @@ public class GeoNotes {
          *   pero explica a los alumnos que en Java 21 LinkedHashMap implementa SequencedMap y se puede pedir la vista invertida.
          * - Virtual Threads: demo aparte en el otro proyecto “moderno” (no se usan aquí).
          */
+    }
+
+    private static void listarRecientes() {
+        System.out.println("Cantidad de notas que deseas: ");
+        int num = scanner.nextInt();
+        scanner.nextLine();
+
+        List<Note> listaNotas = timeline.latest(num);
+        int contador = 1;
+
+        for (Note note : listaNotas) {
+            System.out.println("Nota " + contador + ": " + note);
+            contador ++;
+        }
     }
 }

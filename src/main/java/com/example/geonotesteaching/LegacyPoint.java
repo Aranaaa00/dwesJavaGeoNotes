@@ -1,0 +1,54 @@
+package com.example.geonotesteaching;
+
+public class LegacyPoint {
+    /* Al no ser una clase record, esta clase contiene más código ya que necesitas
+    implementar getters, hashcode, equals y el toString, en cambio en Geopoint, al ser record, evitas todo ese código de forma visual, ya que se implementa solo*/
+    
+    private double lat, lon;
+
+    public LegacyPoint(double lat, double lon) {
+        this.lat = lat;
+        this.lon = lon;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLon() {
+        return lon;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        long temp;
+        temp = Double.doubleToLongBits(lat);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(lon);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        LegacyPoint other = (LegacyPoint) obj;
+        if (Double.doubleToLongBits(lat) != Double.doubleToLongBits(other.lat))
+            return false;
+        if (Double.doubleToLongBits(lon) != Double.doubleToLongBits(other.lon))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "LegacyPoint [lat=" + lat + ", lon=" + lon + "]";
+    }
+}
