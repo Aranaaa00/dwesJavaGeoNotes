@@ -1,7 +1,7 @@
 package com.example.geonotesteaching;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -78,7 +78,8 @@ public class GeoNotes {
                     case 5 -> listarRecientes();
                     case 6 -> busquedaAvanzada();
                     case 7 -> mostrarLugaresNotes();
-                    case 8 -> running = false;
+                    case 8 -> mostrarInverso();
+                    case 9 -> running = false;
                     default -> System.out.println("❌ Opción no válida. Inténtalo de nuevo.");
                 }
             } catch (NumberFormatException e) {
@@ -92,19 +93,26 @@ public class GeoNotes {
         System.out.println("¡Gracias por usar GeoNotes! 👋");
     }
 
+    private static void mostrarInverso() {
+        Collection<Note> notas = timeline.reversed();
+
+        for (Note note : notas) {
+            System.out.println(note);
+        }
+    }
+
     private static void mostrarLugaresNotes() {
         for (Note nota : timeline.getNotes().values()) {
             System.out.println(Match.where(nota.location()));
         }
     }
 
-    private static void busquedaAvanzada() {
+    private static void busquedaAvanzada() throws NumberFormatException {
         System.out.println("¿Por qué quieres buscar?");
         System.out.println("1. Por latitud o longitud");
-        System.out.println("2. Palabra clave");
-
-        int opcion = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println("2. Palabra clave"); 
+        
+        int opcion = Integer.parseInt(scanner.nextLine().trim());
 
         if (opcion == 1) {
             busquedaLatLong();
@@ -113,23 +121,21 @@ public class GeoNotes {
         } else {
             System.out.println("Opción no valida");
         }
-
     }
 
-    private static void busquedaLatLong() {
+    private static void busquedaLatLong() throws NumberFormatException {
         String respuesta = "";
         int min, max;
 
         do {
             System.out.println("Indica si quieres buscar por Latitud o Longitud (lat - lon):");
-            respuesta = scanner.next();
+            respuesta = scanner.nextLine();
 
             System.out.println("Indica el mínimo del rango:");
-            min = scanner.nextInt();
+            min = Integer.parseInt(scanner.nextLine().trim());
             System.out.println("Indica el máximo del rango:");
-            max = scanner.nextInt();
+            max = Integer.parseInt(scanner.nextLine().trim());
 
-            scanner.nextLine();
         } while ((!respuesta.equals("lat") || !respuesta.equals("lon")) && min > max);
 
         for (Long id : timeline.getNotes().keySet()) {
@@ -169,11 +175,12 @@ public class GeoNotes {
         System.out.println("5. Listar últimas N notas");
         System.out.println("6. Busqueda avanzada");
         System.out.println("7. Lugar de las notes");
-        System.out.println("8. Salir");
+        System.out.println("8. Listar (reversed)");
+        System.out.println("9. Salir");
         System.out.print("Elige una opción: ");
     }
 
-    private static void createNote() {
+    private static void createNote() throws NumberFormatException {
         System.out.println("\n--- Crear una nueva nota ---");
 
         // 'var' (Java 10) para inferencia local: útil para código más legible; en APIs públicas, mejor tipos explícitos.
@@ -306,10 +313,9 @@ public class GeoNotes {
          */
     }
 
-    private static void listarRecientes() {
+    private static void listarRecientes() throws NumberFormatException {
         System.out.println("Cantidad de notas que deseas: ");
-        int num = scanner.nextInt();
-        scanner.nextLine();
+        int num = Integer.parseInt(scanner.nextLine().trim());
 
         List<Note> listaNotas = timeline.latest(num);
         int contador = 1;

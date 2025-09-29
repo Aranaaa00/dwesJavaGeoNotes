@@ -1,10 +1,12 @@
 package com.example.geonotesteaching;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
 // A diferencia de un HashMap, un 'SequencedMap' garantiza el orden y permite acceder
 // al primer y último elemento de forma eficiente.
 final class Timeline {
-    private final Map<Long, Note> notes = new LinkedHashMap<>();
+    private final SequencedMap<Long, Note> notes = new LinkedHashMap<>();
 
     public void addNote(Note note) { 
         notes.put(note.id(), note); 
@@ -46,6 +48,10 @@ final class Timeline {
         return listaDevuelta;
     }
 
+    public Collection<Note> reversed() {
+        return notes.reversed().values();
+    }
+    
     // Esta clase final genera la salida JSON usando 'text blocks'.
     public final class Render extends AbstractExporter implements Exporter {
         @Override 
